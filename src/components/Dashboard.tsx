@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import PlaylistCard from "./PlaylistCard";
+import BACKEND_URL from "../config/Backend";
 
 interface SpotifyImage {
   url: string;
@@ -116,13 +117,13 @@ const Dashboard = () => {
 
         console.log("Profile Data:", profileRes.data);
         // Playlists
-        const playlistsRes = await axios.get("https://spotify-cooked-frontend.vercel.app/api/playlists", {
+        const playlistsRes = await axios.get(`${BACKEND_URL}/api/playlists`, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         if (!isMountedRef.current) return;
         setPlaylists(playlistsRes.data.items || []);
         console.log("Playlists Data:", playlistsRes.data);
-        
+
         if (playlistsRes.data.items?.length > 0) {
           setIsChatOpen(true);
         }
@@ -163,7 +164,7 @@ const Dashboard = () => {
 
     try {
       const response = await axios.post(
-        "https://spotify-cooked-frontend.vercel.app/api/ai/roast-playlists",
+        `${BACKEND_URL}/api/ai/roast-playlists`,
         { playlists },
         { headers: { Authorization: `Bearer ${authToken}` } }
       );
@@ -377,8 +378,8 @@ const Dashboard = () => {
                     <div className="flex items-center justify-center  ">
                       {isRoasting ? (
                         <>
-                           <Loader2 className="w-5 h-5 animate-spin mr-2 inline-block" /> 
-                         Roasting... 
+                          <Loader2 className="w-5 h-5 animate-spin mr-2 inline-block" />
+                          Roasting...
                           {/* <div className="h-full w-full"> */}
                           {/* 'Roasting...' */}
                           {/* <div className="flex items-center justify-center">
