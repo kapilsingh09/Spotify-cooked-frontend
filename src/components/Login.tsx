@@ -2,10 +2,11 @@ import { motion } from "framer-motion";
 import logo from "../assets/spotify.png";
 import waguri from "../assets/Kaoruko Waguri.jpg";
 import { Info } from "lucide-react";
+import BACKEND_URL from '../config/Backend';
 
 const Login = () => {
   const handleLogin = () => {
-    window.location.href = "http://127.0.0.1:3000/auth/login";
+    window.location.href = `${BACKEND_URL}/auth/login`;
   };
 
   return (
