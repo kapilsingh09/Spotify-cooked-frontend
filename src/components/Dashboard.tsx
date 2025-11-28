@@ -382,8 +382,8 @@ const Dashboard = () => {
                     <div className="flex items-center justify-center  ">
                       {isRoasting ? (
                         <>
-                          <Loader2 className="w-5 h-5 animate-spin mr-2 inline-block" />
-                          Roasting...
+                          {/* <Loader2 className="w-5 h-5 animate-spin mr-2 inline-block" /> */}
+                          {/* Roasting... */}
                           {/* <div className="h-full w-full"> */}
                           {/* 'Roasting...' */}
                           {/* <div className="flex items-center justify-center">
