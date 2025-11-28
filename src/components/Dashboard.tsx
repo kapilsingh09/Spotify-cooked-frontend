@@ -7,6 +7,7 @@ import {
 import { motion } from "framer-motion";
 import PlaylistCard from "./PlaylistCard";
 import BACKEND_URL from "../config/Backend";
+import CustomLoader from './CustomLoader'
 
 interface SpotifyImage {
   url: string;
@@ -397,7 +398,7 @@ const Dashboard = () => {
     />
   </div>
 </div> */}
-                          {/* <CustomLoader /> */}
+                           <CustomLoader /> 
                           {/* <myLoader /> */}
                           {/* </div> */}
                         </>
