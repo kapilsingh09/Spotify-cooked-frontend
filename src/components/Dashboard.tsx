@@ -121,7 +121,8 @@ const Dashboard = () => {
         });
         if (!isMountedRef.current) return;
         setPlaylists(playlistsRes.data.items || []);
-
+        console.log("Playlists Data:", playlistsRes.data);
+        
         if (playlistsRes.data.items?.length > 0) {
           setIsChatOpen(true);
         }
