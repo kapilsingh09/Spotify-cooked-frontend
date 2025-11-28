@@ -115,10 +115,13 @@ const Dashboard = () => {
         if (!isMountedRef.current) return;
         setProfile(profileRes.data);
 
-        console.log("Profile Data:", profileRes.data);
-        // Playlists
-        const playlistsRes = await axios.get(`${BACKEND_URL}/api/playlists`, {
+        // console.log("Profile Data:", profileRes.data);
+        // Playlists - Call Spotify API directly
+        const playlistsRes = await axios.get("https://api.spotify.com/v1/me/playlists", {
           headers: { Authorization: `Bearer ${authToken}` },
+          params: {
+            limit: 50, // Get up to 50 playlists
+          },
         });
         if (!isMountedRef.current) return;
         setPlaylists(playlistsRes.data.items || []);
