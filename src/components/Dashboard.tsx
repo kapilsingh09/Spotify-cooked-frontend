@@ -1,16 +1,51 @@
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import {
-  LogOut,
   Loader2,
-  Clock,
   Music,
-  Users,
-  Zap,
-  MessageSquare,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import PlaylistCard from "./PlaylistCard";
+
+interface SpotifyImage {
+  url: string;
+  height: number;
+  width: number;
+}
+
+interface SpotifyProfile {
+  display_name: string;
+  id: string;
+  images?: SpotifyImage[];
+  followers?: {
+    total: number;
+  };
+  product?: string;
+}
+
+interface PlaylistOwner {
+  display_name: string;
+  id: string;
+}
+
+interface PlaylistTracks {
+  total: number;
+}
+
+interface ExternalUrls {
+  spotify: string;
+}
+
+interface Playlist {
+  id: string;
+  name: string;
+  description?: string;
+  images?: SpotifyImage[];
+  tracks?: PlaylistTracks;
+  owner?: PlaylistOwner;
+  public?: boolean;
+  external_urls: ExternalUrls;
+}
 
 import CustomLoader from "./CustomLoader";
 
@@ -18,22 +53,22 @@ import CustomLoader from "./CustomLoader";
 
 const DEFAULT_AVATAR_PATH = "../assets/Kaoruko Waguri.jpg";
 const SPOTIFY_GREEN = "#1DB954";
-    
-    // export default Dashboard
-    const Dashboard = () => {
-      const [profile, setProfile] = useState(null);
-  const [playlists, setPlaylists] = useState([]);
-  const [authToken, setAuthToken] = useState(localStorage.getItem("access_token"));
-  const [loading, setLoading] = useState(true);
-  const [isRoasting, setIsRoasting] = useState(false);//i have to false it
-  const [roastOutput, setRoastOutput] = useState("");
-  const [error, setError] = useState(null);
-  const [isChatOpen, setIsChatOpen] = useState(false);
 
-  const intervalRef = useRef(null);
-  const isMountedRef = useRef(true);
+// export default Dashboard
+const Dashboard = () => {
+  const [profile, setProfile] = useState<SpotifyProfile | null>(null);
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [authToken, setAuthToken] = useState<string | null>(localStorage.getItem("access_token"));
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isRoasting, setIsRoasting] = useState<boolean>(false);//i have to false it
+  const [roastOutput, setRoastOutput] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
+  const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
 
-  
+  const intervalRef = useRef<number | null>(null);
+  const isMountedRef = useRef<boolean>(true);
+
+
   // Cleanup
   useEffect(() => {
     return () => {
@@ -145,7 +180,9 @@ const SPOTIFY_GREEN = "#1DB954";
         index++;
 
         if (index >= text.length) {
-          clearInterval(intervalRef.current);
+          if (intervalRef.current !== null) {
+            clearInterval(intervalRef.current);
+          }
           intervalRef.current = null;
           setIsRoasting(false);
         }
@@ -175,7 +212,7 @@ const SPOTIFY_GREEN = "#1DB954";
           src={imageUrl}
           alt={profile.display_name || "User"}
           className="w-full h-full object-cover"
-          onError={(e) => (e.currentTarget.style.display = "none")}
+          onError={(e: React.SyntheticEvent<HTMLImageElement>) => (e.currentTarget.style.display = "none")}
         />
       );
     }
@@ -330,19 +367,18 @@ const SPOTIFY_GREEN = "#1DB954";
                     style={{
                       backgroundColor: SPOTIFY_GREEN,
                       color: "#000",
-                      boxShadow: `0 0 20px rgba(29,185,84,${
-                        isRoasting ? 0.8 : 0.4
-                      })`,
+                      boxShadow: `0 0 20px rgba(29,185,84,${isRoasting ? 0.8 : 0.4
+                        })`,
                     }}
                   >
                     <div className="flex items-center justify-center  ">
-  {isRoasting ? (
-                      <>
-                        {/* <Loader2 className="w-5 h-5 animate-spin mr-2 inline-block" />
+                      {isRoasting ? (
+                        <>
+                          {/* <Loader2 className="w-5 h-5 animate-spin mr-2 inline-block" />
                         // Roasting... */}
-                        {/* <div className="h-full w-full"> */}
-  {/* 'Roasting...' */}
-{/* <div className="flex items-center justify-center">
+                          {/* <div className="h-full w-full"> */}
+                          {/* 'Roasting...' */}
+                          {/* <div className="flex items-center justify-center">
   <div className="h-20  overflow-hidden rounded-full border border-white/20  ">
     <video
       src={videos[3]}
@@ -354,31 +390,30 @@ const SPOTIFY_GREEN = "#1DB954";
     />
   </div>
 </div> */}
-<CustomLoader />
-       {/* <myLoader /> */}
-                        {/* </div> */}
-                      </>
-                    ) : roastOutput ? (
-                      
-                      <span className="py-3 px-4 ">Roast Again</span>
-                    ) : (
-                    <span className="py-3 px-4 ">Roast my Vibes</span>
-                    )}
+                          <CustomLoader />
+                          {/* <myLoader /> */}
+                          {/* </div> */}
+                        </>
+                      ) : roastOutput ? (
+
+                        <span className="py-3 px-4 ">Roast Again</span>
+                      ) : (
+                        <span className="py-3 px-4 ">Roast my Vibes</span>
+                      )}
                     </div>
-                  
+
                   </motion.button>
                 </div>
 
                 <div
-                  className={`text-lg text-gray-100 leading-relaxed whitespace-pre-wrap font-light font-bold transition ${
-                    isChatOpen ? "block" : "hidden"
-                  }`}
+                  className={`text-lg text-gray-100 leading-relaxed whitespace-pre-wrap font-light font-bold transition ${isChatOpen ? "block" : "hidden"
+                    }`}
                 >
                   {roastOutput ? (
                     <span className="break-words">{roastOutput}</span>
                   ) : (
                     <p className="text-gray-400 text-base  mt-3">
-                        Your AI-generated roast will appear here. Click "Roast My Vibes" to get started!
+                      Your AI-generated roast will appear here. Click "Roast My Vibes" to get started!
                     </p>
                   )}
                 </div>

@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import vid1 from '../assets/vid1.mp4';
 import vid2 from '../assets/vid2.mp4';
 import vid3 from '../assets/vid3.mp4';
@@ -9,8 +9,8 @@ import vid6 from '../assets/vid6.mp4';
 const videos = [vid1, vid2, vid3, vid4, vid5, vid6];
 
 export default function VideoSequencePlayer() {
-  const [index, setIndex] = useState(null);
-  const videoRef = useRef(null);
+  const [index, setIndex] = useState<number | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   // 1️⃣ First time component loads → give random index
   useEffect(() => {
@@ -22,15 +22,17 @@ export default function VideoSequencePlayer() {
   useEffect(() => {
     if (index === null) return;
     const videoEl = videoRef.current;
+    if (!videoEl) return;
 
     videoEl.load();
     const p = videoEl.play();
-    if (p && p.catch) p.catch(() => {});
+    if (p && p.catch) p.catch(() => { });
   }, [index]);
 
   // 3️⃣ Go to next video (NO random)
   const handleNextAutoVideo = () => {
     setIndex((prev) => {
+      if (prev === null) return prev;
       if (prev + 1 < videos.length) {
         return prev + 1; // next video
       }

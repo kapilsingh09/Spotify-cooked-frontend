@@ -1,12 +1,44 @@
 import React from "react";
-import { Music, User, Lock, Globe } from "lucide-react";
+import { Music, Lock, Globe } from "lucide-react";
 
-const ACCENT_COLOR = "#1DB954"; // Spotify Green
 
-const PlaylistCard = ({ playlist }) => {
+interface PlaylistImage {
+  url: string;
+  height: number;
+  width: number;
+}
+
+interface PlaylistOwner {
+  display_name: string;
+  id: string;
+}
+
+interface PlaylistTracks {
+  total: number;
+}
+
+interface ExternalUrls {
+  spotify: string;
+}
+
+interface Playlist {
+  id: string;
+  name: string;
+  description?: string;
+  images?: PlaylistImage[];
+  tracks?: PlaylistTracks;
+  owner?: PlaylistOwner;
+  public?: boolean;
+  external_urls: ExternalUrls;
+}
+
+interface PlaylistCardProps {
+  playlist: Playlist;
+}
+
+const PlaylistCard: React.FC<PlaylistCardProps> = ({ playlist }) => {
   const imageUrl = playlist.images?.[0]?.url || null;
   const trackCount = playlist.tracks?.total || 0;
-  const ownerName = playlist.owner?.display_name || "Spotify User";
   const isPublic = playlist.public;
 
   // console.log("Playlist Data:", playlist);
@@ -17,7 +49,7 @@ const PlaylistCard = ({ playlist }) => {
                  hover:bg-white/10 hover:border-white/20 transition-all duration-300 cursor-pointer group 
                  transform hover:scale-[1.01] active:scale-[0.98]"
 
-      onClick={()=>window.open(playlist.external_urls.spotify,'_blank')}
+      onClick={() => window.open(playlist.external_urls.spotify, '_blank')}
     >
       {/* Playlist Cover */}
       <div className="relative mb-4 overflow-hidden rounded-lg aspect-square bg-gray-900 shadow-2xl">
@@ -48,30 +80,29 @@ const PlaylistCard = ({ playlist }) => {
             {/* <Music className="w-4 h-4" style={{ color: ACCENT_COLOR }} /> */}
             <h2>
 
-            {trackCount} {trackCount === 1 ? "Song" : "Songs"}
+              {trackCount} {trackCount === 1 ? "Song" : "Songs"}
             </h2>
           </span>
           {/* <span className="flex items-center justify-center border w-30 py-0.5 rounded-2xl backdrop-blur-2xl bg-white/10 truncate">
             <User className="w-3.5 h-3.5" />
           {/* <h1 className="">{ownerName}</h1> */}
-          {/* </span> */} 
+          {/* </span> */}
         </div>
-        
+
         {/* Description/Status */}
-        {playlist.description == " "  &&<p className="text-xs text-gray-500 line-clamp-2 pt-1">
+        {playlist.description == " " && <p className="text-xs text-gray-500 line-clamp-2 pt-1">
           {playlist.description || "No description provided."}
         </p>
         }
         {/* Public/Private Status Badge */}
         <span
-            className={`inline-flex items-center gap-1 px-2 py-0.5 mt-2 rounded-full text-xs font-semibold ${
-                isPublic 
-                    ? 'bg-green-600/20 text-green-400 border border-green-700' 
-                    : 'bg-red-600/20 text-red-400 border border-red-700'
+          className={`inline-flex items-center gap-1 px-2 py-0.5 mt-2 rounded-full text-xs font-semibold ${isPublic
+            ? 'bg-green-600/20 text-green-400 border border-green-700'
+            : 'bg-red-600/20 text-red-400 border border-red-700'
             }`}
         >
-            {isPublic ? <Globe className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
-            {isPublic ? 'Public' : 'Private'}
+          {isPublic ? <Globe className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
+          {isPublic ? 'Public' : 'Private'}
         </span>
       </div>
     </div>
