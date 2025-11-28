@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import logo from "../assets/spotify.png";
-import waguri from '../assets/Kaoruko Waguri.jpg'
+import waguri from "../assets/Kaoruko Waguri.jpg";
 import { Info } from "lucide-react";
 
 const Login = () => {
@@ -9,81 +9,79 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col w-full items-center justify-center bg-linear-to-br from-black  to-black px-4">
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="max-w-md w-full text-center"
-      >
-        {/* Logo / Title */}
-        <div className="  h-[60vh]  mb-13 w-full  flex-col flex items-center justify-center  ">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-5xl font-black text-white tracking-tight mb-2 "
-            style={{ fontFamily: 'Circular, -apple-system, BlinkMacSystemFont, sans-serif' }}
-          >
-            Cooked !
-          </motion.h1>
+    <div className="min-h-screen w-full flex flex-col overflow-hidden bg-black">
 
-          <p className="text-lg text-gray-200 font-semibold mb-5">
-            Get your playlists roasted by AI
-          </p>
+      {/* MAIN CENTERED CONTENT */}
+      <div className="flex-grow flex items-center justify-center px-4 py-10 mb-10">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-md w-full text-center"
+        >
+          {/* TITLE */}
+          <div className="mb-8">
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-5xl font-black text-white tracking-tight mb-2"
+            >
+              Cooked !
+            </motion.h1>
 
-          <div className="h-50   w-full flex gap-1 mb-8 items-center justify-center">
-            <img src={waguri} alt="Kaoruko Waguri" className="h-40 w-40 rounded-full" />
-            <div className="text-gray-400 text-sm mt-2 px-4 ">
+            <p className="text-lg text-gray-200 font-semibold mb-6">
+              Get your playlists roasted by AI
+            </p>
+          </div>
+
+          {/* IMAGE + TEXT */}
+          <div className="flex flex-col md:flex-row items-center justify-center gap-3 mb-4">
+            <img
+              src={waguri}
+              alt="Kaoruko Waguri"
+              className="h-40 w-40 md:h-52 md:w-52 rounded-full object-cover"
+            />
+
+            <div className="text-gray-400 text-sm px-2 md:px-4 max-w-xs">
               <p>
-                Music is the spice of life, and with Cooked, your playlists get a dash of AI flavor! Let your tunes simmer in the digital kitchen and emerge with a fresh, personalized twist. Bon appétit for your ears!
+                Music is the spice of life, and with Cooked, your playlists get a dash
+                of AI flavor! Let your tunes simmer in the digital kitchen and emerge
+                with a fresh, personalized twist.
               </p>
             </div>
           </div>
+
+          {/* LOGIN BUTTON */}
           <motion.button
-            whileHover={{ scale: 0.99, boxShadow: "0 0 30px rgba(29, 185, 84, 0.4)" }}
+            whileHover={{ scale: 0.99, boxShadow: "0 0 30px rgba(29,185,84,0.4)" }}
             whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
-            // style={{ fontFamily: 'Circular, -apple-system, BlinkMacSystemFont, sans-serif' }}
             onClick={handleLogin}
-            className="w-full  bg-linear-to-r from-[#8ca796]  to-[#1ed760] text-black font-bold h-15 rounded-full text-lg shadow-xl hover:cursor-pointer uppercase tracking-wide  transition-all duration-300 hover:shadow-2xl"
+            className="w-full bg-gradient-to-r from-[#8ca796] to-[#1ed760] text-black font-bold py-4 rounded-full text-lg shadow-xl uppercase tracking-wide transition-all duration-300 hover:shadow-2xl"
           >
-            <div className="flex items-center justify-center mr-2 space-x-4 gap-4">
-              <img src={logo} alt="logo" className="inline-block  h-10 w-10" />
-              {/* <h1 className="font-nbold text-lg"> */}
-
+            <div className="flex items-center font-bold justify-center gap-3">
+              <img src={logo} alt="logo" className="h-9 w-9 md:h-10 md:w-10" />
               Login with Spotify
-              {/* </h1> */}
             </div>
-
           </motion.button>
-        </div>
+        </motion.div>
+      </div>
 
-      </motion.div>
+      {/* FOOTER */}
       <footer
-        className="
-    absolute bottom-0 left-0 right-0
-    px-4 py-3
-    flex flex-col md:flex-row
-    items-center md:items-center
-    justify-center md:justify-between
-    gap-3
-    text-gray-500 text-xs tracking-wide
-  "
+        className="w-full px-4 py-4 flex flex-col md:flex-row items-center justify-center md:justify-between gap-3 text-gray-500 text-xs md:text-sm"
       >
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="flex items-center gap-1 text-center md:text-left text-xs md:text-sm"
+          className="flex items-center gap-1 text-center"
         >
           <Info className="h-3 w-3.5 hidden sm:inline-block" />
           We only read your playlists and make fun. No data stored.
         </motion.p>
 
-        <div className="md:w-100 ">
-
-          <p className="text-gray-500 text-xs md:text-sm text-center md:text-left">
+        <div className="flex lg:w-96 w-39 items-center gap-1 text-center">
+          <p className="text-gray-500 text-xs md:text-sm text-center">
             Powered by Spotify × Gemini
           </p>
         </div>
