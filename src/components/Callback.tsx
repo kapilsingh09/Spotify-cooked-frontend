@@ -1,7 +1,7 @@
 // src/pages/Callback.jsx
 import { useEffect } from "react";
 import axios from "axios";
-
+import { BACKEND_URL } from "../config/Backend.";
 const Callback = () => {
   useEffect(() => {
     const code = new URLSearchParams(window.location.search).get("code");
@@ -13,7 +13,7 @@ const Callback = () => {
 
     // Send code to backend
     axios
-      .get(`http://127.0.0.1:3000/auth/callback?code=${code}`)
+      .get(`${BACKEND_URL}/auth/callback?code=${code}`)
       .then((res) => {
         console.log(res.data);
         localStorage.setItem("access_token", res.data.access_token);
