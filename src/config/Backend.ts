@@ -1,4 +1,4 @@
 // Backend URL configuration for API calls
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+const BACKEND_URL = "https://spotify-cooked-backend.vercel.app";
 
 export default BACKEND_URL;
