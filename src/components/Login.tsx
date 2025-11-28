@@ -64,7 +64,6 @@ const Login = () => {
               Login with Spotify
             </div>
           </motion.button>
-          <a href="/test">go to</a>
         </motion.div>
       </div>
 

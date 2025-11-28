@@ -47,7 +47,7 @@ interface Playlist {
   external_urls: ExternalUrls;
 }
 
-import CustomLoader from "./CustomLoader";
+// import CustomLoader from "./CustomLoader";
 
 // import vid3 from '../assets/vid3.mp4';
 
@@ -110,11 +110,13 @@ const Dashboard = () => {
         const profileRes = await axios.get("https://api.spotify.com/v1/me", {
           headers: { Authorization: `Bearer ${authToken}` },
         });
+
         if (!isMountedRef.current) return;
         setProfile(profileRes.data);
 
+        console.log("Profile Data:", profileRes.data);
         // Playlists
-        const playlistsRes = await axios.get("/api/playlists", {
+        const playlistsRes = await axios.get("https://spotify-cooked-frontend.vercel.app/api/playlists", {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         if (!isMountedRef.current) return;
@@ -287,7 +289,7 @@ const Dashboard = () => {
               onClick={handleLogout}
               className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 text-sm text-gray-300 hover:text-red-400 hover:border-red-400 transition bg-white/5 backdrop-blur-sm"
             >
-              <span className="hidden md:inline">Log out</span>
+              <span >Log out</span>
             </button>
           </div>
         </div>
@@ -374,8 +376,8 @@ const Dashboard = () => {
                     <div className="flex items-center justify-center  ">
                       {isRoasting ? (
                         <>
-                          {/* <Loader2 className="w-5 h-5 animate-spin mr-2 inline-block" />
-                        // Roasting... */}
+                           <Loader2 className="w-5 h-5 animate-spin mr-2 inline-block" /> 
+                         Roasting... 
                           {/* <div className="h-full w-full"> */}
                           {/* 'Roasting...' */}
                           {/* <div className="flex items-center justify-center">
@@ -390,7 +392,7 @@ const Dashboard = () => {
     />
   </div>
 </div> */}
-                          <CustomLoader />
+                          {/* <CustomLoader /> */}
                           {/* <myLoader /> */}
                           {/* </div> */}
                         </>
@@ -406,11 +408,11 @@ const Dashboard = () => {
                 </div>
 
                 <div
-                  className={`text-lg text-gray-100 leading-relaxed whitespace-pre-wrap font-light font-bold transition ${isChatOpen ? "block" : "hidden"
+                  className={`text-lg text-gray-100 leading-relaxed whitespace-pre-wrap  font-bold transition ${isChatOpen ? "block" : "hidden"
                     }`}
                 >
                   {roastOutput ? (
-                    <span className="break-words">{roastOutput}</span>
+                    <span>{roastOutput}</span>
                   ) : (
                     <p className="text-gray-400 text-base  mt-3">
                       Your AI-generated roast will appear here. Click "Roast My Vibes" to get started!
