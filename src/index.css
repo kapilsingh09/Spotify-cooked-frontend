@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+/* ===========================
+   SPOTIFY AUTHENTIC THEME
+   =========================== */
+
+:root {
+  /* Spotify Colors */
+  --spotify-green: #1DB954;
+  --spotify-black: #000000;
+  --spotify-dark-bg: #121212;
+  --spotify-card-bg: #181818;
+  --spotify-hover: #282828;
+  --spotify-white: #FFFFFF;
+  --spotify-gray: #B3B3B3;
+  --spotify-dark-gray: #535353;
+
+  /* Spacing */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+}
+
+/* ===========================
+   Global Resets
+   =========================== */
+
+/* * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+} */
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  background: var(--spotify-black);
+  color: var(--spotify-white);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+
+
