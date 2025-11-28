@@ -1,41 +1,28 @@
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import {
-  Loader2,
-  Music,
-} from "lucide-react";
+import { Loader2, Music } from "lucide-react";
 import { motion } from "framer-motion";
 import PlaylistCard from "./PlaylistCard";
+import defaultAvatar from "../assets/Kaoruko Waguri.jpg";
 
-interface SpotifyImage {
-  url: string;
-  height: number;
-  width: number;
-}
+const SPOTIFY_GREEN = "#1DB954";
 
+// AUTO-SELECT BACKEND URL
+const API_BASE_URL = import.meta.env.PROD
+  ? "https://YOUR_BACKEND_URL.vercel.app"
+  : "http://localhost:3000";
+
+interface SpotifyImage { url: string; height: number; width: number; }
 interface SpotifyProfile {
   display_name: string;
   id: string;
   images?: SpotifyImage[];
-  followers?: {
-    total: number;
-  };
+  followers?: { total: number };
   product?: string;
 }
-
-interface PlaylistOwner {
-  display_name: string;
-  id: string;
-}
-
-interface PlaylistTracks {
-  total: number;
-}
-
-interface ExternalUrls {
-  spotify: string;
-}
-
+interface PlaylistOwner { display_name: string; id: string; }
+interface PlaylistTracks { total: number; }
+interface ExternalUrls { spotify: string; }
 interface Playlist {
   id: string;
   name: string;
@@ -47,20 +34,12 @@ interface Playlist {
   external_urls: ExternalUrls;
 }
 
-// import CustomLoader from "./CustomLoader";
-
-// import vid3 from '../assets/vid3.mp4';
-
-const DEFAULT_AVATAR_PATH = "../assets/Kaoruko Waguri.jpg";
-const SPOTIFY_GREEN = "#1DB954";
-
-// export default Dashboard
 const Dashboard = () => {
   const [profile, setProfile] = useState<SpotifyProfile | null>(null);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [authToken, setAuthToken] = useState<string | null>(localStorage.getItem("access_token"));
   const [loading, setLoading] = useState<boolean>(true);
-  const [isRoasting, setIsRoasting] = useState<boolean>(false);//i have to false it
+  const [isRoasting, setIsRoasting] = useState<boolean>(false);
   const [roastOutput, setRoastOutput] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
@@ -68,8 +47,7 @@ const Dashboard = () => {
   const intervalRef = useRef<number | null>(null);
   const isMountedRef = useRef<boolean>(true);
 
-
-  // Cleanup
+  // CLEAR INTERVALS ON UNMOUNT
   useEffect(() => {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -77,75 +55,74 @@ const Dashboard = () => {
     };
   }, []);
 
-  // Parse tokens from URL
+  // FETCH TOKENS FROM URL
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const accessToken = urlParams.get("access_token");
-    const refreshToken = urlParams.get("refresh_token");
+    const params = new URLSearchParams(window.location.search);
+    const access = params.get("access_token");
+    const refresh = params.get("refresh_token");
 
-    if (accessToken && refreshToken) {
-      localStorage.setItem("access_token", accessToken);
-      localStorage.setItem("refresh_token", refreshToken);
-      setAuthToken(accessToken);
+    if (access && refresh) {
+      localStorage.setItem("access_token", access);
+      localStorage.setItem("refresh_token", refresh);
+      setAuthToken(access);
 
       window.history.replaceState({}, document.title, "/dashboard");
     }
   }, []);
 
-  // Fetch profile + playlists
+  // MAIN DATA FETCH
   useEffect(() => {
     if (!authToken) {
       setLoading(false);
       return;
     }
 
-    isMountedRef.current = true;
-
-    const fetchData = async () => {
+    const fetchEverything = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        // Profile
+        // PROFILE
         const profileRes = await axios.get("https://api.spotify.com/v1/me", {
           headers: { Authorization: `Bearer ${authToken}` },
         });
-
-        if (!isMountedRef.current) return;
         setProfile(profileRes.data);
 
-        console.log("Profile Data:", profileRes.data);
-        // Playlists
-        const playlistsRes = await axios.get("https://spotify-cooked-frontend.vercel.app/api/playlists", {
+        // PLAYLISTS
+        const playlistsRes = await axios.get(`${API_BASE_URL}/api/playlists`, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
-        if (!isMountedRef.current) return;
-        setPlaylists(playlistsRes.data.items || []);
 
-        if (playlistsRes.data.items?.length > 0) {
+        console.log("Playlist Response:", playlistsRes.data);
+
+        const items =
+          playlistsRes.data.items ||
+          playlistsRes.data.playlists ||
+          playlistsRes.data ||
+          [];
+
+        setPlaylists(items);
+
+        if (items.length > 0) {
           setIsChatOpen(true);
         }
+
       } catch (err) {
-        console.error("Error fetching data:", err);
-        setError("Failed to load your data. Please login again.");
-      } finally {
-        if (isMountedRef.current) setLoading(false);
+        console.error("Fetch error:", err);
+        setError("Unable to load data — login again.");
       }
+
+      if (isMountedRef.current) setLoading(false);
     };
 
-    fetchData();
-
-    return () => {
-      isMountedRef.current = false;
-    };
+    fetchEverything();
   }, [authToken]);
 
-  // Roast logic
+  // AI ROAST
   const handleRoast = async () => {
     if (isRoasting) return;
-
     if (playlists.length === 0) {
-      setError("You don't have any playlists to roast — add one and try again.");
+      setError("No playlists found to roast.");
       setIsChatOpen(true);
       return;
     }
@@ -155,44 +132,29 @@ const Dashboard = () => {
     setError(null);
     setIsChatOpen(true);
 
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-
     try {
-      const response = await axios.post(
-        "/api/ai/roast-playlists",
+      const res = await axios.post(
+        `${API_BASE_URL}/api/ai/roast-playlists`,
         { playlists },
         { headers: { Authorization: `Bearer ${authToken}` } }
       );
 
-      let rawText = response.data?.roast || "No roast returned — try again later.";
+      const text = res.data.roast || "No roast returned.";
+      let i = 0;
 
-      if (/roast:/i.test(rawText)) {
-        const match = rawText.match(/•[\s\S]*/);
-        rawText = match ? match[0] : rawText;
-      }
+      intervalRef.current = window.setInterval(() => {
+        setRoastOutput((p) => p + text.charAt(i));
+        i++;
 
-      const text = rawText.trim();
-      let index = 0;
-
-      intervalRef.current = setInterval(() => {
-        setRoastOutput((prev) => prev + text.charAt(index));
-        index++;
-
-        if (index >= text.length) {
-          if (intervalRef.current !== null) {
-            clearInterval(intervalRef.current);
-          }
+        if (i >= text.length) {
+          clearInterval(intervalRef.current!);
           intervalRef.current = null;
           setIsRoasting(false);
         }
       }, 20);
     } catch (err) {
-      console.error("Error roasting playlists:", err);
-      setError("Something went wrong while roasting — please try again.");
-      setRoastOutput("Something went wrong — couldn't generate a roast.");
+      console.error(err);
+      setError("Roast failed — try again.");
       setIsRoasting(false);
     }
   };
@@ -203,266 +165,130 @@ const Dashboard = () => {
     window.location.href = "/";
   };
 
-  // Avatar logic
   const renderAvatar = () => {
-    const imageUrl = profile?.images?.[0]?.url;
-    const initial = profile?.display_name?.charAt(0) || "U";
+    const url = profile?.images?.[0]?.url;
 
-    if (imageUrl) {
-      return (
-        <img
-          src={imageUrl}
-          alt={profile.display_name || "User"}
-          className="w-full h-full object-cover"
-          onError={(e: React.SyntheticEvent<HTMLImageElement>) => (e.currentTarget.style.display = "none")}
-        />
-      );
+    if (url) {
+      return <img src={url} className="w-full h-full object-cover" />;
     }
 
     return (
-      <div className="w-full h-full bg-gray-800 flex items-center justify-center relative">
-        <img
-          src={DEFAULT_AVATAR_PATH}
-          alt="default avatar"
-          className="w-full h-full object-cover opacity-70"
-          style={{ objectPosition: "top" }}
-          onError={(e) => (e.currentTarget.style.display = "none")}
-        />
-        <span className="absolute inset-0 flex items-center justify-center text-7xl font-extrabold text-gray-300 bg-black/30">
-          {initial}
-        </span>
-      </div>
+      <img
+        src={defaultAvatar}
+        className="w-full h-full object-cover opacity-80"
+        style={{ objectPosition: "top" }}
+      />
     );
   };
 
-  // No token
+  // NO TOKEN
   if (!authToken) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="text-center p-10 bg-gray-900 rounded-xl shadow-2xl">
-          <h2 className="text-3xl font-bold mb-6 text-white">Authentication Required</h2>
-
-          <button
-            onClick={() => (window.location.href = "/")}
-            className="px-8 py-3 rounded-full font-bold text-lg transition duration-300 transform hover:scale-[1.02] active:scale-95 shadow-lg"
-            style={{
-              backgroundColor: SPOTIFY_GREEN,
-              color: "#000",
-              boxShadow: `0 0 15px rgba(29,185,84,0.6)`,
-            }}
-          >
-            Connect with Spotify
-          </button>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        <button onClick={() => (window.location.href = "/")}>Login First</button>
       </div>
     );
   }
 
-  // Loading
+  // LOADING
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="text-center">
-          <Loader2 className="w-16 h-16 animate-spin mx-auto mb-4" style={{ color: SPOTIFY_GREEN }} />
-          <p className="text-xl font-medium text-gray-400">Pinging Spotify... preparing the roast...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        <Loader2 className="w-14 h-14 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white font-sans">
+    <div className="min-h-screen bg-black text-white">
       {/* HEADER */}
-      <header className="sticky top-0 z-50 bg-black/80 backdrop-blur-lg border-b border-white/10 shadow-xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <motion.h1
-            initial={{ y: -10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.4 }}
-            className="text-4xl font-extrabold tracking-tighter flex items-center"
-          >
-            Cooked !
-          </motion.h1>
-
-          <div className="flex items-center gap-4">
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 text-sm text-gray-300 hover:text-red-400 hover:border-red-400 transition bg-white/5 backdrop-blur-sm"
-            >
-              <span >Log out</span>
-            </button>
-          </div>
-        </div>
+      <header className="sticky top-0 bg-black/80 backdrop-blur-lg p-4 flex justify-between">
+        <h1 className="text-4xl font-bold">Cooked!</h1>
+        <button onClick={handleLogout} className="border px-4 py-2 rounded-lg">
+          Log out
+        </button>
       </header>
 
       {/* MAIN */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-12">
-        {/* USER + ROAST */}
-        <section className="mb-12">
-          <div className="hidden lg:block mb-8">
-            <h2 className="text-5xl font-extrabold tracking-tight">
-              Welcome back, <span style={{ color: SPOTIFY_GREEN }}>{profile?.display_name}</span>!
+      <main className="max-w-7xl mx-auto p-8">
+
+        {/* USER & ROAST */}
+        <div className="flex flex-col lg:flex-row gap-10">
+
+          {/* AVATAR SIDEBAR */}
+          <div className="w-full lg:w-72 p-6 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-xl">
+            <div
+              className="w-40 h-40 mx-auto rounded-full overflow-hidden border-4 shadow-xl"
+              style={{ borderColor: SPOTIFY_GREEN }}
+            >
+              {renderAvatar()}
+            </div>
+
+            <h2 className="text-center text-3xl font-bold mt-4">
+              {profile?.display_name}
             </h2>
-            <p className="text-lg text-gray-400 mt-2">
-              Check out your playlists below or let the AI do the talking.
-            </p>
+
+            <p className="text-center text-gray-400">{profile?.id}</p>
+
+            <div className="mt-6 space-y-3 text-gray-300">
+              <p>Followers: {profile?.followers?.total}</p>
+              <p>Total Playlists: {playlists.length}</p>
+              <p>Account Type: {profile?.product}</p>
+            </div>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-10 items-start">
-            {/* SIDEBAR */}
-            <div className="flex flex-col items-center gap-6 w-full lg:w-72 p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm shadow-xl shrink-0">
-              <div
-                className="relative w-40 h-40 rounded-full shadow-2xl overflow-hidden transition duration-300 hover:scale-[1.03]"
-                style={{
-                  border: `4px solid ${SPOTIFY_GREEN}`,
-                  boxShadow: `0 0 20px rgba(0,0,0,0.8), 0 0 10px rgba(29,185,84,0.6)`,
-                }}
-              >
-                {renderAvatar()}
-              </div>
+          {/* ROAST CHAMBER */}
+          <div className="flex-1">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-8 bg-white/5 rounded-3xl border border-white/10 shadow-xl"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-2xl font-bold">AI Roast Chamber</h3>
 
-              <div className="text-center w-full">
-                <h2 className="text-3xl font-black mb-1 truncate">{profile?.display_name}</h2>
-                <p className="text-sm font-medium text-gray-400">{profile?.id}</p>
-              </div>
-
-              <div className="flex flex-col space-y-3 text-sm text-gray-300 w-full pt-4 border-t border-white/10">
-                <span className="flex items-center justify-between">
-                  <span>Followers:</span>
-                  <span className="font-semibold text-white">{profile?.followers?.total ?? 0}</span>
-                </span>
-
-                <span className="flex items-center justify-between">
-                  <span>Total Playlists:</span>
-                  <span className="font-semibold text-white">{playlists.length}</span>
-                </span>
-
-                <span className="flex items-center justify-between">
-                  <span>Account Type:</span>
-                  <span className="font-semibold text-white capitalize">{profile?.product || "Unknown"}</span>
-                </span>
-              </div>
-            </div>
-
-            {/* ROAST CHAMBER */}
-            <div className="flex-1 w-full mt-4 lg:mt-0">
-              <motion.div
-                initial={{ opacity: 0, y: 5 }}
-                animate={
-                  isChatOpen
-                    ? { opacity: 1, y: 0, height: "auto" }
-                    : { opacity: 0, y: 5, height: 0 }
-                }
-                transition={{ duration: 0.5 }}
-                className="rounded-3xl  md:p-8 backdrop-blur-2xl bg-white/5 border border-white/10 shadow-2xl overflow-hidden"
-                style={{ minHeight: isChatOpen ? "180px" : "0" }}
-              >
-                <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
-                  <h3 className="text-2xl font-extrabold text-white ">AI Roast Chamber</h3>
-
-                  <motion.button
-                    onClick={handleRoast}
-                    disabled={isRoasting || playlists.length === 0}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="h-full  rounded-full font-bold text-base transition disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{
-                      backgroundColor: SPOTIFY_GREEN,
-                      color: "#000",
-                      boxShadow: `0 0 20px rgba(29,185,84,${isRoasting ? 0.8 : 0.4
-                        })`,
-                    }}
-                  >
-                    <div className="flex items-center justify-center  ">
-                      {isRoasting ? (
-                        <>
-                           <Loader2 className="w-5 h-5 animate-spin mr-2 inline-block" /> 
-                         Roasting... 
-                          {/* <div className="h-full w-full"> */}
-                          {/* 'Roasting...' */}
-                          {/* <div className="flex items-center justify-center">
-  <div className="h-20  overflow-hidden rounded-full border border-white/20  ">
-    <video
-      src={videos[3]}
-      className="object-contain object-center h-full w-full"
-      autoPlay
-      muted
-      playsInline
-      loop
-    />
-  </div>
-</div> */}
-                          {/* <CustomLoader /> */}
-                          {/* <myLoader /> */}
-                          {/* </div> */}
-                        </>
-                      ) : roastOutput ? (
-
-                        <span className="py-3 px-4 ">Roast Again</span>
-                      ) : (
-                        <span className="py-3 px-4 ">Roast my Vibes</span>
-                      )}
-                    </div>
-
-                  </motion.button>
-                </div>
-
-                <div
-                  className={`text-lg text-gray-100 leading-relaxed whitespace-pre-wrap  font-bold transition ${isChatOpen ? "block" : "hidden"
-                    }`}
+                <button
+                  onClick={handleRoast}
+                  disabled={isRoasting}
+                  className="px-4 py-2 rounded-full font-bold"
+                  style={{ backgroundColor: SPOTIFY_GREEN, color: "#000" }}
                 >
-                  {roastOutput ? (
-                    <span>{roastOutput}</span>
-                  ) : (
-                    <p className="text-gray-400 text-base  mt-3">
-                      Your AI-generated roast will appear here. Click "Roast My Vibes" to get started!
-                    </p>
-                  )}
-                </div>
+                  {isRoasting ? "Roasting..." : roastOutput ? "Roast Again" : "Roast My Vibes"}
+                </button>
+              </div>
 
-                {error && (
-                  <div className="mt-4 text-base font-semibold text-red-400">{error}</div>
-                )}
-              </motion.div>
-            </div>
+              <div className="whitespace-pre-wrap text-lg text-gray-100">
+                {roastOutput || "Your roast will appear here..."}
+              </div>
+
+              {error && <p className="text-red-400 mt-3">{error}</p>}
+            </motion.div>
           </div>
-        </section>
+        </div>
 
+        {/* DIVIDER */}
         <div className="border-t border-white/10 my-10"></div>
 
         {/* PLAYLISTS */}
-        <section className="mb-12">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8">
-            <h3 className="text-4xl font-extrabold">
-              Your Playlists{" "}
-              <span className="text-gray-400 font-medium ml-2">
-                ({playlists.length})
-              </span>
-            </h3>
-            <p className="text-sm text-gray-500 mt-2 sm:mt-0">
-              Click a card to see more details.
-            </p>
-          </div>
+        <div>
+          <h3 className="text-4xl font-bold mb-6">
+            Your Playlists <span className="text-gray-400">({playlists.length})</span>
+          </h3>
 
           {playlists.length === 0 ? (
-            <div className="text-center py-20 bg-white/5 rounded-xl border border-white/10 shadow-inner">
-              <Music className="w-10 h-10 mx-auto mb-4" style={{ color: SPOTIFY_GREEN }} />
-              <p className="text-gray-300 text-xl font-medium">
-                No Public Playlists Found
-              </p>
-              <p className="text-gray-500 text-base mt-2">
-                Make sure your playlists are public on Spotify so the AI can find (and judge)
-                them!
-              </p>
+            <div className="text-center p-16 bg-white/5 border border-white/10 rounded-xl">
+              <Music className="mx-auto w-10 h-10" />
+              <p className="mt-4 text-gray-400">No Public Playlists Found</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-              {playlists.map((playlist) => (
-                <PlaylistCard key={playlist.id} playlist={playlist} />
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+              {playlists.map((pl) => (
+                <PlaylistCard key={pl.id} playlist={pl} />
               ))}
             </div>
           )}
-        </section>
+        </div>
+
       </main>
     </div>
   );
