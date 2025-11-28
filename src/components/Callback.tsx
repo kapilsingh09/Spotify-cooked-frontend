@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import axios from "axios";
 // import BACKEND_URL  from "../config/Backend";
-import BACKEND_URL from '../config/Backend';
+// import BACKEND_URL from '../config/Backend';
 const Callback = () => {
   useEffect(() => {
     const code = new URLSearchParams(window.location.search).get("code");
@@ -14,9 +14,9 @@ const Callback = () => {
 
     // Send code to backend
     axios
-      .get(`${BACKEND_URL}/auth/callback?code=${code}`)
+      .get(`https://spotify-cooked-backend.vercel.app/auth/callback?code=${code}`)
       .then((res) => {
-        console.log(res.data);
+        // console.log(res.data);
         localStorage.setItem("access_token", res.data.access_token);
         localStorage.setItem("refresh_token", res.data.refresh_token);
 
