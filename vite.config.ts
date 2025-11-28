@@ -10,7 +10,7 @@ export default defineConfig({
     // Proxy API requests to the backend running on port 3000 in development
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: process.env.VITE_BACKEND_URL,
         changeOrigin: true,
         secure: false,
       },
