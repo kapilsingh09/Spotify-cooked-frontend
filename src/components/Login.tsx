@@ -2,15 +2,13 @@ import { motion } from "framer-motion";
 import logo from "../assets/spotify.png";
 import waguri from "../assets/Kaoruko Waguri.jpg";
 import { Info } from "lucide-react";
-// import BACKEND_URL from '../config/Backend';
 
 const Login = () => {
   const handleLogin = () => {
-    window.location.href = `https://spotify-cooked-backend.vercel.app/auth/callback`;
+    // Hardcoded production URL
+    window.location.href = `https://spotify-cooked-backend.vercel.app/auth/login`;
   };
 
-    // console.log(BACKEND_URL);
-  
   return (
     <div className="min-h-screen w-full flex flex-col overflow-hidden bg-black">
 
