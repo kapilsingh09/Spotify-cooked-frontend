@@ -203,60 +203,42 @@ const Dashboard = () => {
     }
   };
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     try {
-      // 1. Call backend logout endpoint to invalidate tokens server-side
-      const token = localStorage.getItem("access_token");
-
-      if (token) {
-        try {
-          await axios.post(
-            `${BACKEND_URL}/auth/logout`,
-            { access_token: token },
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-        } catch (err) {
-          console.error("Backend logout error (non-critical):", err);
-          // Continue with client-side cleanup even if backend fails
-        }
-      }
-
-      // 2. Clear ALL localStorage items
+      // 1. Clear ALL localStorage items FIRST
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
-      // Clear any other app-specific storage
       localStorage.clear();
 
-      // 3. Clear ALL sessionStorage items
+      // 2. Clear ALL sessionStorage items
       sessionStorage.clear();
 
-      // 4. Clear cookies (if any)
+      // 3. Clear ALL cookies
       document.cookie.split(";").forEach((c) => {
         document.cookie = c
           .replace(/^ +/, "")
           .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
       });
 
-      // 5. Reset component state
+      // 4. Reset component state
       setAuthToken(null);
       setProfile(null);
       setPlaylists([]);
       setRoastOutput("");
       setError(null);
 
-      // 6. Force Spotify to show login screen again by redirecting with cache-busting
-      // Adding timestamp prevents browser from using cached authorization
-      window.location.href = `/?logout=true&t=${Date.now()}`;
-
-      // Alternative: If you want to completely clear browser cache, use:
-      // window.location.replace(`/?logout=true&t=${Date.now()}`);
+      // 5. Redirect to backend logout endpoint
+      // Backend will clear server-side sessions and redirect to Spotify logout
+      // Spotify will then redirect back to our login page
+      // This ensures Spotify's session is destroyed and forces login screen on next attempt
+      window.location.href = `${BACKEND_URL}/auth/logout`;
 
     } catch (err) {
       console.error("Logout error:", err);
-      // Fallback: force redirect even if something fails
+      // Fallback: clear storage and redirect to backend logout anyway
       localStorage.clear();
       sessionStorage.clear();
-      window.location.href = "/";
+      window.location.href = `${BACKEND_URL}/auth/logout`;
     }
   };
 
