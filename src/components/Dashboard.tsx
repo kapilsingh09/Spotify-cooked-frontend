@@ -94,12 +94,12 @@ const Dashboard = () => {
     }
   }, []);
 
-  console.log(BACKEND_URL);
+
   // Fetch profile + playlists
   useEffect(() => {
     if (!authToken) {
       setLoading(false);
-      
+
       return;
     }
 
@@ -386,65 +386,64 @@ const Dashboard = () => {
             </div>
 
             {/* ROAST CHAMBER */}
-        {/* /* Updated responsive version — logic untouched */ }
-        <div className="flex-1 w-full mt-4 lg:mt-0">
-          <motion.div
-            initial={{ opacity: 0, y: 5 }}
-            animate={
-              isChatOpen
-                ? { opacity: 1, y: 0, height: "auto" }
-                : { opacity: 0, y: 5, height: 0 }
-            }
-            transition={{ duration: 0.5 }}
-            className="rounded-3xl p-4 sm:p-6 md:p-8 backdrop-blur-2xl bg-white/5 border border-white/10 shadow-2xl overflow-hidden w-full"
-            style={{ minHeight: isChatOpen ? "180px" : "0" }}
-          >
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 border-b border-white/10 pb-3 gap-3">
-              <h3 className="text-xl sm:text-2xl font-extrabold text-white">AI Roast Chamber</h3>
-
-              <motion.button
-                onClick={handleRoast}
-                disabled={isRoasting || playlists.length === 0}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.98 }}
-                className="rounded-full font-bold text-sm sm:text-base transition disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 sm:px-6 sm:py-3"
-                style={{
-                  backgroundColor: SPOTIFY_GREEN,
-                  color: "#000",
-                  boxShadow: `0 0 20px rgba(29,185,84,${isRoasting ? 0.8 : 0.4})`,
-                }}
+            {/* /* Updated responsive version — logic untouched */}
+            <div className="flex-1 w-full mt-4 lg:mt-0">
+              <motion.div
+                initial={{ opacity: 0, y: 5 }}
+                animate={
+                  isChatOpen
+                    ? { opacity: 1, y: 0, height: "auto" }
+                    : { opacity: 0, y: 5, height: 0 }
+                }
+                transition={{ duration: 0.5 }}
+                className="rounded-3xl p-4 sm:p-6 md:p-8 backdrop-blur-2xl bg-white/5 border border-white/10 shadow-2xl overflow-hidden w-full"
+                style={{ minHeight: isChatOpen ? "180px" : "0" }}
               >
-                <div className="flex items-center justify-center">
-                  {isRoasting ? (
-                    <CustomLoader />
-                  ) : roastOutput ? (
-                    <span>Roast Again</span>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 border-b border-white/10 pb-3 gap-3">
+                  <h3 className="text-xl sm:text-2xl font-extrabold text-white">AI Roast Chamber</h3>
+
+                  <motion.button
+                    onClick={handleRoast}
+                    disabled={isRoasting || playlists.length === 0}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="rounded-full font-bold text-sm sm:text-base transition disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 sm:px-6 sm:py-3"
+                    style={{
+                      backgroundColor: SPOTIFY_GREEN,
+                      color: "#000",
+                      boxShadow: `0 0 20px rgba(29,185,84,${isRoasting ? 0.8 : 0.4})`,
+                    }}
+                  >
+                    <div className="flex items-center justify-center">
+                      {isRoasting ? (
+                        <CustomLoader />
+                      ) : roastOutput ? (
+                        <span>Roast Again</span>
+                      ) : (
+                        <span>Roast my Vibes</span>
+                      )}
+                    </div>
+                  </motion.button>
+                </div>
+
+                <div
+                  className={`text-base sm:text-lg text-gray-100 leading-relaxed whitespace-pre-wrap font-bold transition ${isChatOpen ? "block" : "hidden"
+                    }`}
+                >
+                  {roastOutput ? (
+                    <span>{roastOutput}</span>
                   ) : (
-                    <span>Roast my Vibes</span>
+                    <p className="text-gray-400 text-sm sm:text-base mt-3">
+                      Your AI-generated roast will appear here. Click "Roast My Vibes" to get started!
+                    </p>
                   )}
                 </div>
-              </motion.button>
-            </div>
 
-            <div
-              className={`text-base sm:text-lg text-gray-100 leading-relaxed whitespace-pre-wrap font-bold transition ${
-                isChatOpen ? "block" : "hidden"
-              }`}
-            >
-              {roastOutput ? (
-                <span>{roastOutput}</span>
-              ) : (
-                <p className="text-gray-400 text-sm sm:text-base mt-3">
-                  Your AI-generated roast will appear here. Click "Roast My Vibes" to get started!
-                </p>
-              )}
+                {error && (
+                  <div className="mt-4 text-sm sm:text-base font-semibold text-red-400">{error}</div>
+                )}
+              </motion.div>
             </div>
-
-            {error && (
-              <div className="mt-4 text-sm sm:text-base font-semibold text-red-400">{error}</div>
-            )}
-          </motion.div>
-        </div>
           </div>
         </section>
 

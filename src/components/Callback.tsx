@@ -15,7 +15,7 @@ const Callback = () => {
     axios
       .get(`https://spotify-cooked-backend.vercel.app/auth/callback?code=${code}`)
       .then((res) => {
-        console.log(res.data);
+
         localStorage.setItem("access_token", res.data.access_token);
         localStorage.setItem("refresh_token", res.data.refresh_token);
 
@@ -23,7 +23,7 @@ const Callback = () => {
         window.location.href = "/dashboard";
       })
       .catch((err) => {
-        console.error(err);
+        console.error("Token exchange failed:", err);
         alert("Token exchange failed");
       });
   }, []);
