@@ -168,7 +168,7 @@ const Dashboard = () => {
 
     try {
       const response = await axios.post(
-        `${BACKEND_URL}/api/ai/roast-playlists`,
+        `http://localhost:3000/api/ai/roast-playlists`,
         { playlists },
         { headers: { Authorization: `Bearer ${authToken}` } }
       );
