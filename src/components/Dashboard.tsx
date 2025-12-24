@@ -94,10 +94,12 @@ const Dashboard = () => {
     }
   }, []);
 
+  console.log(BACKEND_URL);
   // Fetch profile + playlists
   useEffect(() => {
     if (!authToken) {
       setLoading(false);
+      
       return;
     }
 
@@ -168,7 +170,7 @@ const Dashboard = () => {
 
     try {
       const response = await axios.post(
-        `${BACKEND_URL}/api/ai/roast-playlists`,
+        `https://spotify-cooked-backend.vercel.app/api/ai/roast-playlists`,
         { playlists },
         { headers: { Authorization: `Bearer ${authToken}` } }
       );
