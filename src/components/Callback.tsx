@@ -10,8 +10,7 @@ const Callback = () => {
       alert("Authorization failed");
       return;
     }
-
-    // Send code to backend (hardcoded production URL)
+    //sending to auth/callback
     axios
       .get(`https://spotify-cooked-backend.vercel.app/auth/callback?code=${code}`)
       .then((res) => {
@@ -21,7 +20,7 @@ const Callback = () => {
 
         // Redirect to dashboard
         window.location.href = "/dashboard";
-      })
+      })  
       .catch((err) => {
         console.error("Token exchange failed:", err);
         alert("Token exchange failed");
