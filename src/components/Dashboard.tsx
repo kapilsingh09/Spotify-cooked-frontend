@@ -170,7 +170,7 @@ const Dashboard = () => {
 
     try {
       const response = await axios.post(
-        `https://spotify-cooked-backend.vercel.app/api/ai/roast-playlists`,
+        `${BACKEND_URL}/api/ai/roast-playlists`,
         { playlists },
         { headers: { Authorization: `Bearer ${authToken}` } }
       );

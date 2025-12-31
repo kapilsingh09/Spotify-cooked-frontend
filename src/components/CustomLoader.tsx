@@ -12,13 +12,13 @@ export default function VideoSequencePlayer() {
   const [index, setIndex] = useState<number | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  // 1️⃣ First time component loads → give random index
+  // 1 First time component loads → give random index
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * videos.length);
     setIndex(randomIndex);
   }, []);
 
-  // 2️⃣ Auto-play whenever video changes
+  // 2 Auto-play whenever video changes
   useEffect(() => {
     if (index === null) return;
     const videoEl = videoRef.current;
@@ -29,7 +29,7 @@ export default function VideoSequencePlayer() {
     if (p && p.catch) p.catch(() => { });
   }, [index]);
 
-  // 3️⃣ Go to next video (NO random)
+  // 3 Go to next video (NO random)
   const handleNextAutoVideo = () => {
     setIndex((prev) => {
       if (prev === null) return prev;
